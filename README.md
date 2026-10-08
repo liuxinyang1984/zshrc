@@ -34,7 +34,7 @@ git clone git@github.com:liuxinyang1984/zshrc.git ~/git/zshrc
 
 已有 `~/.p10k.zsh` 会继续用。没有则启动 zsh 后执行 `p10k configure`。
 
-dotfiles 登记 submodule 之后：`~/git/dotfiles/install.sh zsh` 会调用本仓 `install.sh`。
+已由 [dotfiles](https://github.com/liuxinyang1984/dotfiles) 登记为 `vendor/zshrc`：`~/git/dotfiles/install.sh zsh` 会调用本仓 `install.sh`。
 
 ## alias
 

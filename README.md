@@ -25,12 +25,13 @@ git clone git@github.com:liuxinyang1984/zshrc.git ~/git/zshrc
 3. 保证 `~/.zshrc` 有一行 `source ~/.config/zsh/zshrc`（旧 symlink 会先备份；旧的 source 行会替换）
 
 ```bash
-./install.sh --dev           # 不拷贝，~/.zshrc 直接 source 本仓库（改完即生效）
+./install.sh                 # 默认：~/.config/zsh → symlink 本仓库
+./install.sh --copy          # 拷贝到 ~/.config/zsh
 ./install.sh --plugins-only  # 只更新插件
 ./install-plugins.sh         # 同上
 ```
 
-改仓库后要让日常 shell 吃到新配置，再跑一次 `./install.sh`（非 `--dev`）。
+默认 symlink 时改仓库即生效；`--copy` 后需再跑一次 `./install.sh --copy` 才同步。
 
 已有 `~/.p10k.zsh` 会继续用。没有则启动 zsh 后执行 `p10k configure`。
 

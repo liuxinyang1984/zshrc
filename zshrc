@@ -1,5 +1,5 @@
 # zshrc — 由 install.sh 同步到 ~/.config/zsh（或 --dev 时直接 source 仓库）
-# 插件: ~/.local/share/zsh/plugins（install-plugins.sh），不依赖发行版包路径。
+# 插件优先发行版路径（Arch/Alpine /usr/share/...），否则 ~/.local/share/zsh/plugins
 
 # 本文件所在目录 = 安装目录（~/.config/zsh）或开发时的仓库根
 ZSHRC_HOME="${${(%):-%x}:A:h}"
@@ -31,22 +31,41 @@ compinit
 typeset -U path
 path=("$HOME/.local/bin" $path)
 
+# 在候选路径中找第一个可读文件并 source；找不到则返回 1
+_zsh_source_first() {
+  local f
+  for f in "$@"; do
+    if [[ -r $f ]]; then
+      source "$f"
+      return 0
+    fi
+  done
+  return 1
+}
+
 ZSH_PLUGINS="${XDG_DATA_HOME}/zsh/plugins"
 _zsh_need_plugins=0
-for _p in \
-  "$ZSH_PLUGINS/powerlevel10k/powerlevel10k.zsh-theme" \
+
+# 顺序对齐本机 MyArch：highlighting → autosuggestions → p10k（系统包优先）
+_zsh_source_first \
+  /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
   "$ZSH_PLUGINS/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" \
-  "$ZSH_PLUGINS/zsh-autosuggestions/zsh-autosuggestions.zsh"
-do
-  if [[ -r $_p ]]; then
-    source "$_p"
-  else
-    _zsh_need_plugins=1
-  fi
-done
-unset _p
+  || _zsh_need_plugins=1
+
+_zsh_source_first \
+  /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh \
+  "$ZSH_PLUGINS/zsh-autosuggestions/zsh-autosuggestions.zsh" \
+  || _zsh_need_plugins=1
+
+_zsh_source_first \
+  /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme \
+  /usr/share/zsh/plugins/powerlevel10k/powerlevel10k.zsh-theme \
+  "$ZSH_PLUGINS/powerlevel10k/powerlevel10k.zsh-theme" \
+  || _zsh_need_plugins=1
+
+unset -f _zsh_source_first
 if (( _zsh_need_plugins )); then
-  print -u2 "zshrc: 缺少插件，请在仓库目录运行 ./install.sh 或 ./install-plugins.sh"
+  print -u2 "zshrc: 缺少插件（发行版包或 ./install-plugins.sh）"
 fi
 unset _zsh_need_plugins
 

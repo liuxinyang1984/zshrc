@@ -19,7 +19,9 @@ fi
 HISTFILE="${HISTFILE:-$HOME/.histfile}"
 HISTSIZE=1000
 SAVEHIST=1000
+# 行编辑 vi 模式（Esc 进 normal；KEYTIMEOUT 缩短 Esc 等待）
 bindkey -v
+KEYTIMEOUT=1
 
 zstyle :compinstall filename "${ZDOTDIR:-$HOME}/.zshrc"
 autoload -Uz compinit

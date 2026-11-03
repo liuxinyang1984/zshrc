@@ -121,5 +121,22 @@ fi
 
 SOURCE_LINE="source $INSTALL_DIR/zshrc"
 ensure_source_line "$ZSHRC_DEST" "$SOURCE_LINE"
+
+# Alpine /etc/zsh/zshrc 自动加载 plugins 目录；必须用 ~/.zshenv 清空 zsh_plugin_dirs
+ZSHENV_DEST="${ZDOTDIR:-$HOME}/.zshenv"
+ZSHENV_SRC="$ROOT/zshenv"
+if [ -f "$ZSHENV_SRC" ]; then
+	if [ -L "$ZSHENV_DEST" ] || [ ! -e "$ZSHENV_DEST" ]; then
+		ln -sfn "$ZSHENV_SRC" "$ZSHENV_DEST"
+		echo "zshenv → $ZSHENV_DEST（禁用 Alpine 自动插件）"
+	elif ! grep -q 'zsh_plugin_dirs=()' "$ZSHENV_DEST" 2>/dev/null; then
+		printf '\n# from vendor/zshrc\n' >>"$ZSHENV_DEST"
+		cat "$ZSHENV_SRC" >>"$ZSHENV_DEST"
+		echo "已追加 zsh_plugin_dirs=() → $ZSHENV_DEST"
+	else
+		echo "$ZSHENV_DEST 已含 zsh_plugin_dirs=()"
+	fi
+fi
+
 echo "zshrc 安装完成。新开终端或 exec zsh。"
 echo "私货放: $CONFIG_HOME/shell/local/*.alias"
